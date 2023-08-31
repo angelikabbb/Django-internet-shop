@@ -1,6 +1,9 @@
 from django.urls import path
 
-app_anme = 'cart'
+
+
+app_name = 'carts'
 urlpatterns = [
-    # path('admin/', admin.site.urls),
+    
+    
 ]
