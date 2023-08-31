@@ -27,8 +27,8 @@
   display: inline-block;
   transition: color .2s;
 }
-.menu-main a, .menu-main a:visited {color: #ecb41cf5;}
-.menu-main a.current, .menu-main a:hover{color: #f30531;}
+.menu-main a, .menu-main a:visited {color: #f6f611f5;}
+.menu-main a.current, .menu-main a:hover{color: #04bd01;}
 .menu-main a:before,
 .menu-main a:after {
   content: "";
@@ -38,7 +38,7 @@
   right: 50%;
   bottom: -5px;
   left: 50%;
-  background: #1212c5;
+  background: #8c12c5;
   transition: .5s;
 }
 .menu-main a:hover:before, .menu-main .current:before {left: 0;}

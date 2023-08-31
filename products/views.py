@@ -63,7 +63,7 @@ class ProductCreateView(CreateView):
     template_name = 'products/product-form.html'
     success_url = reverse_lazy('products:index')
 
-    def get_context_data(self, **kwargs: Any) -> Dict[str, Any]:
+    def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['categories'] = Category.objects.all()
         context['subcategories'] = SubCategory.objects.all()

@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'orders',
     'users',
     'products',
-]
+    'slugify',
+    ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
