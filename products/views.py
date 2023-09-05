@@ -89,6 +89,15 @@ class ProductListView(ListView):
         queryset = Products.objects.filter(subcategory__slug = slug)
         return queryset
     
+def get_category(self):
+    category = Category.objects.all()
+    context = {
+        'category-list': category
+    }
+    return context
+
+def add_to_cart(request, product_slug):
+    return HttpResponse(product_slug)
        
 
 

@@ -69,7 +69,8 @@ class Products(models.Model):
     def get_absolute_url(self):  # Используется для получения URL возвращает страничку
         return reverse('products:product-detail', kwargs={
             'cat_slug': self.category.slug, 
-            'subcat_slug':self.slug, 'prod_slug': self.slug
+            'subcat_slug':self.slug, 
+            'prod_slug': self.slug
             }
         ) 
     

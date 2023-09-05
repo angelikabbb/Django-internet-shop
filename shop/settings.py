@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'users',
     'products',
     'slugify',
+    'sorl.thumbnail',
     ]
 
 MIDDLEWARE = [
