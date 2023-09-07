@@ -102,4 +102,7 @@ def add_to_cart(request, product_slug):
 
 
 class ProductDetailView(DetailView):
-    pass
+    model = Products
+    template_name = 'products/product-detail.html'
+    context_object_name = 'product'
+    slug_url_kwarg = 'prod_slug'
