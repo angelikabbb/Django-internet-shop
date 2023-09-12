@@ -41,6 +41,9 @@
         {% for subcategory in c.categories.all %}
         <a class="dropdown-item" href="{{ subcategory.get_absolute_url }}">{{ subcategory.name }}</a>
         {% endfor %}
+      </div>
+    </li>
+    {% endfor %}
 
 {% block content %}
 
