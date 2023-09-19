@@ -6,21 +6,30 @@
   padding-right: 5%;
 }
 .product {
-  width: calc(25% - 10px);
-  margin-bottom: 20px;
-  border: 1px solid #ccc;
-  padding: 10px;
+  width: calc(20% - 10px);
+  margin-bottom: 30px;
+  border: 2px solid black;
+  background-color: #ffffff;
+  border-radius: 10px;
+  padding: 20px;
   text-align: center;
+  text-decoration: none;
+  font-family: 'Courier New', Courier, monospace;
+  ;
 }
 .product img {
-  max-width: 200px;
-  max-height: 200px;
+  max-width: 300px;
+  max-height: 300px;
+  border: 2px solid black;
+  border-radius: 10px;
 }
 .product h2 {
-  font-size: 18px;
+  font-size: 30px;
   margin-top: 10px;
+  font-weight: bold;
+  text-decoration: none;
 }
 .product p {
-  font-size: 14px;
+  font-size: 20px;
   margin-top: 5px;
 }
