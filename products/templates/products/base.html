@@ -16,7 +16,7 @@
 <body>
   <style>
     body {
-      background-image: url("{% static 'img/fon.jpg' %}");
+      background-image: url("{% static 'img/background.jpg' %}");
       background-repeat: no-repeat;
       background-size: cover;
     }  
@@ -24,22 +24,22 @@
   <div class="menu-main">
     <div class="menu-item"><a href="{% url 'products:index' %}">Главная</a></div>
     <div class="menu-item"><a href="">Категории</a></div>
-    <div class="menu-item"><a href="">Заказы</a></div>
+    {% if user.is_authenticated %}
+    <div class="menu-item"><a href={% url "orders:order-list" %}>Заказы</a></div>
+    {% endif %}
     <div class="menu-item"><a href="{% url 'cart:cart-detail' %}">Корзина</a></div>
     <div class="item-space"></div>
-
     {% if not user.is_authenticated %}
       <div class="menu-item"><a href="{% url 'users:register' %}">Зарегистрироваться</a></div>
       <div class="menu-item"><a href="{% url 'users:login' %}">Войти</a></div>
     {% endif %}
-
     {% if user.is_authenticated %}
       <div><a href="{% url 'users:logout' %}">Выйти</a></div>
     {% endif %}
 </div>
   
     {% if user.is_authenticated %}
-    <a style="margin-left:16px" href="#">{{user.username}}</a>
+    <a style="margin-left:16px" href="{% url 'users:user-info' user.pk %}">{{user.username}}</a>
     {% endif %}
 
     <div class="cart">
@@ -61,7 +61,7 @@
 
     {% for c in category_list  %}
     <li class="nav-item dropdown">
-      <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <a class="nav-link dropdown-toggle" href="" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         <strong>{{ c.name }}</strong>
       </a>
       <div class="dropdown-menu" aria-labelledby="navbarDropdown">

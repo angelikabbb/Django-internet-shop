@@ -1,5 +1,4 @@
-from django.shortcuts import render
-from .models import CartItem, CartUser
+import json
 from shop import settings
 from products.models import Products
 from decimal import Decimal
@@ -7,12 +6,17 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
 from products.models import Products
 from .forms import CartAddProductForm
+from cart.models import CartUser, CartItem
+from django.views.decorators.csrf import csrf_exempt
+from django.http.response import HttpResponse
+
 
 # Create your views here.
 
 class Cart:
     def __init__(self, request):
         self.session = request.session
+        self.user = request.user
         cart = self.session.get(settings.CART_SESSION_ID)
         if not cart:
             cart = self.session[settings.CART_SESSION_ID] = {}
@@ -57,10 +61,8 @@ class Cart:
             item['price'] = Decimal(item['price'])
             item['total_price'] = item['price'] * item['quantity']
             yield item
-    
-    
-    
-
+      
+   
     def __len__(self):
         return sum(item['quantity'] for item in self.cart.values())
     
@@ -74,36 +76,33 @@ class Cart:
         self.save()
 
 
-
 @require_POST
 def cart_add(request, product_id):
     if request.user.id:
         return add_cart_db(request, product_id)
-
+    
     cart = Cart(request)
     product = get_object_or_404(Products, id=product_id)
     form = CartAddProductForm(request.POST)
     
+        
     if form.is_valid():
         cd = form.cleaned_data
         cart.add(product=product, 
                  quantity=cd['quantity'],
                  override_quantity=cd['override'])
     else:
+        # добавляем  1 единицу товара
         cart.add(product=product, 
                  quantity=1,
                  override_quantity=False)
     
+    # переходим на страницу корзины
     return redirect('cart:cart-detail')
-
 
 
 @require_POST
 def cart_remove(request, product_id):
-    if request.user.id:
-        return remove_from_db(request, product_id)
-        
-
     cart = Cart(request)
     product = get_object_or_404(Products, id=product_id)
     cart.remove(product)
@@ -116,12 +115,13 @@ def cart_detail(request):
         cart = ProductCartUser(request)
     else:
         cart = Cart(request)
-    
+        
     for item in cart:
         item['update_quantity_form'] = CartAddProductForm(initial={
             'quantity': item['quantity'],
             'override': True})
     return render(request, 'cart/cart-detail.html', {'cart': cart})
+
 
 
 # корзина для авторизованного пользователя (хранится постоянно  в БД)
@@ -152,12 +152,12 @@ class ProductCartUser:
         """
         for item in products_in_cart:
             self.cart[str(item.product_id)] = {'quantity': str(item.quantity), 'price': str(item.product.price)}
- 
+
     # метод добавления товара в корзину (словарь)
     def add(self, product, quantity=1, override_quantity=False):
         product_id = str(product.id)
         #product = Products.objects.get(pk=product.id)
- 
+        
         # проверяем наличие товара в корзине, если нет, то добавляем товар
         if product_id not in self.cart:
             self.cart[product_id]={'quantity': str(quantity), 'price': str(product.price)}
@@ -173,7 +173,7 @@ class ProductCartUser:
                 self.cart[product_id]['quantity'] = quantity
         # вызываем метод сохранения в БД
         self.save()
- 
+
     # метод сохранения в БД
     def save(self):
         # получаем каждый продукт по его ИД в словаре
@@ -188,20 +188,20 @@ class ProductCartUser:
             # иначе - создаем новую позицию товара в корзине
             else:
                 CartItem.objects.create(cart=self.user_cart, product=product, quantity=self.cart[id]['quantity'])
- 
- 
+    
+    
     def remove(self, product_id, request):
         product = Products.objects.get(pk=product_id)
         cart_user = CartUser.objects.get(user=request.user)
         cart_item = CartItem.objects.get(cart=cart_user, product=product)
         cart_item.delete()
- 
- 
+
+
     # метод подсчета товаров в корзине
     def __len__(self):
         return sum(int(item['quantity']) for item in self.cart.values())
- 
- 
+    
+
     # создание итератора для элементов корзины (чтобы можно было проходиться по элементам в цикле)
     def __iter__(self):
         product_ids = self.cart.keys()
@@ -214,13 +214,13 @@ class ProductCartUser:
         for item in cart.values():
             item['total_price'] = item['product'].price * int(item['quantity'])
             yield item
- 
- 
+    
+
     # метод подсчета общей стоимости товаров в корзине
     def get_total_price(self):
         return sum(Decimal(item['price']) * int(item['quantity']) for item in self.cart.values())
- 
- 
+
+
 # добавление товара в корзину методом POST
 @require_POST
 def add_cart_db(request, product_id):
@@ -230,7 +230,7 @@ def add_cart_db(request, product_id):
     product = get_object_or_404(Products, id=product_id)
     # получаем объект заполненной формы со странички
     form = CartAddProductForm(request.POST)
- 
+
     # если форма заполнена правильно        
     if form.is_valid():
         cd = form.cleaned_data
@@ -246,14 +246,34 @@ def add_cart_db(request, product_id):
                  override_quantity=False)
     # переходим на страницу корзины
     return redirect('cart:cart-detail')
- 
- 
+
+
 # удаление товара из корзины
 @require_POST
 def remove_from_db(request, product_id):
     cart = ProductCartUser(request)
     del cart.cart[str(product_id)]
- 
+    
     cart.remove(product_id, request)    
- 
+    
     return redirect('cart:cart-detail')
+
+
+
+
+
+@require_POST
+@csrf_exempt
+def get_ajax(request):
+    data = json.loads(request.body)
+    product_count = data.get('count')
+    product_id = data.get('id')
+    
+    product = get_object_or_404(Products, id=product_id)
+    product_item = CartItem.objects.get(product=product)
+    product_item.quantity = product_count
+    product_item.save()
+    
+    
+    response_data = {'result': 'success'}
+    return HttpResponse(json.dumps(response_data), content_type = 'application/json')
