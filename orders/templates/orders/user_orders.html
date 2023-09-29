@@ -1,9 +1,9 @@
 {% extends "products/base.html" %}
 {% block content %}
 {% load static %}
- 
+
 <link rel="stylesheet" href="{% static 'css/orders.css'%}" type="text/css">
- 
+
     <table class="order-info">
         <tr>    
             <th>Номер заказа</th>
@@ -24,5 +24,5 @@
                     <td>{{order.deliviry}}</td>
                 </tr>
         {% endfor %}
- 
+        
 {% endblock content %}

@@ -23,13 +23,13 @@ from orders import urls as urls_orders
 from django.conf.urls.static import static
 from shop import settings
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include(urls_products)),
     path('users/', include(urls_users)),
     path('cart/', include(urls_cart)),
     path('orders/', include(urls_orders)),
-	# static(settings.MEDIA_URL,document_root=)
+	path('', include(urls_products)),
 ]
 
 if settings.DEBUG: 
